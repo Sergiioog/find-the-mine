@@ -1,4 +1,4 @@
-Se pretende generar un programa que esconda una mina en una matriz.
+/*Se pretende generar un programa que esconda una mina en una matriz.
 
 • Al inicio, el programa guardará en una variable oculta al usuario las coordenadas (fila/columna) de una bomba. 
 • Se generará un tablero formado por casillas en las que el jugador debe buscar esa bomba. 
@@ -62,3 +62,35 @@ momento.
 	
 • Pista: Piensa que primero tendrás que pedir memoria para los punteros de cada fila y luego para cada array de caracteres, cuyo tamaño coincide con el de las columnas. Al ser una matriz cuadrada el
   tamaño será el mismo tanto para las filas como para las columnas.
+  
+  
+• Se debe generar una matriz cuadrada de caracteres de un tamaño dado por el usuario. El tamaño de la matriz se pasa como parámetro de entrada por argc/argv, y se reservará memoria dinámica en
+función de ese valor.*/
+  
+  #include <stdio.h>
+  #include <string.h>
+  #include <stdlib.h>
+  
+  int main(int argc, char * argv[]){
+	  
+	int userSize;
+	
+	printf("Bienvenido al juego, por favor, introduzca el area del tablero: ");
+	scanf("%d", &userSize);
+		
+	char ** matriz = (char **)malloc(userSize * sizeof(char *));
+	
+	
+	for(int i = 0; i < userSize; i++){
+		matriz[i] = (char *)malloc(userSize * sizeof(char));
+        printf("La direccion de memoria de la fila %d es %p\n", i, (void*)matriz[i]);
+	}
+	  
+	printf("La direccion de memoria de la matriz es: %p\n", (void *)matriz);
+
+	for (int i = 0; i < userSize; i++){
+		free(matriz[i]);
+	}
+	free(matriz);
+	return 0;
+  }
