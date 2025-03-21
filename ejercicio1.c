@@ -1,6 +1,8 @@
 /*Se pretende generar un programa que esconda una mina en una matriz.
 
 • Al inicio, el programa guardará en una variable oculta al usuario las coordenadas (fila/columna) de una bomba. 
+
+
 • Se generará un tablero formado por casillas en las que el jugador debe buscar esa bomba. 
 • Con cada intento del usuario se debe comprobar si las coordenadas introducidas coinciden con las de la bomba. 
 • En el momento que se encuentre la bomba acaba el programa. 
@@ -43,54 +45,118 @@ tamaño dado:
 momento.
 
 • Para interactuar con el programa, se debe crear un menú que pida datos al usuario. Las opciones de menú son las siguientes:
-	 Buscar la bomba:
-	 Pedirá por pantalla fila y columna, testeará esas coordenadas y guardará la siguiente
-	información en un array dinámico de intentos:
-	• fila, columna, si la bomba se encuentra en esa fila o en esa columna.
-	 Toda la información de los distintos intentos se guardará en un array cuya memoria
-	se gestionará de forma dinámica.
-	 Visualizar la matriz:
-	 Presentará por pantalla la matriz indicando con el caracter ‘?’ que no se ha buscado
-	en esa posición y con ‘O’ que ha sido un intento fallido.
-	 Visualizar los intentos:
-	 Presentará por pantalla toda la información recogida de cada intento, indicando si
-	se acierta la fila o la columna
-	 Salir
-	 Presenta la matriz antes de salir, en este caso indicando una ‘X’ donde se encontraba
-	la bomba.
-	 Libera toda la memoria dinámica del programa antes de acabar
+	1 Buscar la bomba:
+		 Pedirá por pantalla fila y columna, testeará esas coordenadas y guardará la siguiente
+		información en un array dinámico de intentos:
+		• fila, columna, si la bomba se encuentra en esa fila o en esa columna.
+	
+	
+	2 Visualizar la matriz:
+		 Presentará por pantalla la matriz indicando con el caracter ‘?’ que no se ha buscado
+		en esa posición y con ‘O’ que ha sido un intento fallido.
+		
+		
+	3 Toda la información de los distintos intentos se guardará en un array cuya memoria
+		se gestionará de forma dinámica.
+		Visualizar los intentos:
+		 Presentará por pantalla toda la información recogida de cada intento, indicando si
+		se acierta la fila o la columna
+	
+	4 Salir
+		Presenta la matriz antes de salir, en este caso indicando una ‘X’ donde se encontraba
+		la bomba.
+	
+	5 Libera toda la memoria dinámica del programa antes de acabar
 	
 • Pista: Piensa que primero tendrás que pedir memoria para los punteros de cada fila y luego para cada array de caracteres, cuyo tamaño coincide con el de las columnas. Al ser una matriz cuadrada el
   tamaño será el mismo tanto para las filas como para las columnas.
-  
-  
-• Se debe generar una matriz cuadrada de caracteres de un tamaño dado por el usuario. El tamaño de la matriz se pasa como parámetro de entrada por argc/argv, y se reservará memoria dinámica en
-función de ese valor.*/
+
+
+
+• Al inicio, el programa guardará en una variable oculta al usuario las coordenadas (fila/columna) de una bomba. 
+
+*/
   
   #include <stdio.h>
   #include <string.h>
   #include <stdlib.h>
   
+  int check_option(int opcion);
+  int randomize_bomb(char ** matriz, int userSize);
+  
+  typedef struct {
+	  int fila;
+	  int columna;
+  } Coordenadas_t;	
+  
+  int check_option(int opcion){
+	 
+	printf("Opcion -> %d", opcion);
+	
+	switch(opcion) {
+		case 1:
+			printf("Ha elegido buscar la mina\n");
+			break;
+		case 2:
+			printf("Ha elegido visualizar el numero de intentos\n");
+			break;
+		case 3:
+			printf("Ha elegido ver la matriz\n");
+			break;
+		default:
+			printf("Opcion no valida\n");
+			break;
+	}
+	
+	return 0;
+  }
+  
+  int randomize_bomb(char ** matriz, int userSize){
+	  
+	  int fila_random = rand() % userSize;
+	  int columna_random = rand() % userSize;
+	  
+	  printf(">>> valores random %d %d", fila_random, columna_random);
+	
+  }
+  
   int main(int argc, char * argv[]){
 	  
 	int userSize;
+	int userOption;
+	Coordenadas_t bomba;
+	
 	
 	printf("Bienvenido al juego, por favor, introduzca el area del tablero: ");
 	scanf("%d", &userSize);
-		
+	
+	
 	char ** matriz = (char **)malloc(userSize * sizeof(char *));
-	
-	
 	for(int i = 0; i < userSize; i++){
 		matriz[i] = (char *)malloc(userSize * sizeof(char));
-        printf("La direccion de memoria de la fila %d es %p\n", i, (void*)matriz[i]);
 	}
-	  
+	
+	randomize_bomb(matriz, userSize);
+	 
+	
+	while(1){
+		printf("***************************************************\n");
+		printf("Introduzca una opcion, por favor: \n");
+		printf("1) Buscar\n");
+		printf("2) Visualizar numero de intentos \n");
+		printf("3) Ver la matriz\n");
+		printf("4) Salir\n");
+		printf("***************************************************\n");
+		scanf("%d", &userOption); //Valor de memoria de la var userOption
+		check_option(userOption); //Valor real
+	}
+	
 	printf("La direccion de memoria de la matriz es: %p\n", (void *)matriz);
 
 	for (int i = 0; i < userSize; i++){
 		free(matriz[i]);
 	}
+	
 	free(matriz);
 	return 0;
   }
