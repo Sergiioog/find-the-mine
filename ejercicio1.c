@@ -20,8 +20,10 @@ tamaño dado: -> HECHO
 
 • Se pide implementar una función que rellene un array dinámico doble con un valor por defecto. -> HECHO
 • Al inicio, se rellenará con el valor ‘?’ los elementos de la matriz doble creada anteriormente usando esta función:
-	 void rellenaMatriz(char** matriz, int tam, char valor)
-• El programa pedirá al usuario coordenadas (fila/columna) dentro de la matriz creada anteriormente.
+	 void rellenaMatriz(char** matriz, int tam, char valor) -> HECHO
+	
+• El programa pedirá al usuario coordenadas (fila/columna) dentro de la matriz creada anteriormente. -> HECHO
+
 • El objetivo es encontrar la bomba escondida, se debe almacenar cada intento del usuario y el resultado del mismo. En caso de no haberse encontrado la bomba, este intento 
 	guardará información de ayuda:
 
@@ -35,9 +37,10 @@ tamaño dado: -> HECHO
 		“intento_t” y devuelve al usuario.
 		 void testeaIntento(char** matriz, intento_t* nuevoIntento, coordenadas_t coordenadasBomba)
 		
-• Una vez se tienen las coordenadas del intento, se usa esta función para testear si se ha encontrado la bomba. Se pide implementar una estructura “coordenadas_t” que almacene las coordenadas fila/columna de la bomba.
-• Se usarán esas coordenadas en esta función para el test.
-• En caso de acierto, se marca el intento como “bomba encontrada” y acaba el programa.
+• Una vez se tienen las coordenadas del intento, se usa esta función para testear si se ha encontrado la bomba. Se pide implementar una estructura “coordenadas_t” que almacene las coordenadas fila/columna de la bomba. -> HECHO
+• Se usarán esas coordenadas en esta función para el test. -> HECHO
+• En caso de acierto, se marca el intento como “bomba encontrada” y acaba el programa. -> HECHO
+
 • En caso de fallo, se marca en el intento si ha acertado la fila o la columna, y se marca en la matriz esas coordenadas como casilla explorada (‘O’).
 	 void insertaIntentoEnLista(listaIntentos_t* intentos, intento_t nuevoIntento);
 
@@ -71,6 +74,27 @@ momento.
 • Pista: Piensa que primero tendrás que pedir memoria para los punteros de cada fila y luego para cada array de caracteres, cuyo tamaño coincide con el de las columnas. Al ser una matriz cuadrada el
   tamaño será el mismo tanto para las filas como para las columnas.
 
+
+
+
+• El objetivo es encontrar la bomba escondida, se debe almacenar cada intento del usuario y el resultado del mismo. En caso de no haberse encontrado la bomba, este intento 
+	guardará información de ayuda:
+
+		 La bomba está en esa fila
+		 La bomba está en esa columna
+		 Bomba encontrada
+		 Se debe crear una estructura adecuada para almacenar esos intentos, y un array dinámico
+		que crecerá con cada nuevo intento.
+		 intento_t pedirIntento();
+		• Esta función pide una fila/columna al usuario, lo almacena en una estructura
+		“intento_t” y devuelve al usuario.
+		 void testeaIntento(char** matriz, intento_t* nuevoIntento, coordenadas_t coordenadasBomba)
+		
+		
+			 intento_t pedirIntento();
+		• Esta función pide una fila/columna al usuario, lo almacena en una estructura
+		“intento_t” y devuelve al usuario.
+		 void testeaIntento(char** matriz, intento_t* nuevoIntento, coordenadas_t coordenadasBomba)
 */
   
   #include <stdio.h>
@@ -83,24 +107,42 @@ momento.
 	int columna;
   } Coordenadas_t;	
   
-  int check_option(int opcion, char ** matriz, Coordenadas_t bomba);
+
+  int check_option(int opcion, char ** matriz, Coordenadas_t bomba, int userSize);
   Coordenadas_t randomize_bomb(char ** matriz, int userSize);
   char ** crearMatriz(int numFilasColumnas);
-  void rellenaMatriz(char** matriz, int tam, char valor);
+  void rellenaMatriz(char** matriz, int tam, Coordenadas_t bomba, int filaUsuario, int columnaUsuario);
   bool finJuego = false;
   
   
-  void rellenaMatriz(char** matriz, int tam, char valor){
-	  
+  int numeroIntentos(int intento){
+	
+	static int contador = 0;
+	contador += intento;
+	return contador;	
+  
+  }
+
+  
+  
+  
+ void rellenaMatriz(char** matriz, int tam, Coordenadas_t bomba, int filaUsuario, int columnaUsuario){
+				
+	
 	for(int i = 0; i < tam; i++){
-		matriz[i] = (char *)malloc(tam * sizeof(char));
 		for(int x = 0; x <= tam + 1; x++){
 			printf("-");
 		}
 		printf("\n");
 		printf("|");
 		for(int j = 0; j < tam; j++){
-			matriz[i][j] = valor;
+			if(filaUsuario == i && columnaUsuario == j){
+				matriz[i][j] = 'O';
+			} else {
+				if (matriz[i][j] != 'O') {
+					matriz[i][j] = '?';
+				}
+			}
 			printf("%c", matriz[i][j]);
 		}
 		printf("|\n");
@@ -114,8 +156,8 @@ momento.
   
 	
   char ** crearMatriz(int numFilasColumnas){
+	 
 
-	char valor = '?';
 	char ** matriz = (char **)malloc(numFilasColumnas * sizeof(char *));
 	
 	if(matriz == NULL){
@@ -123,14 +165,19 @@ momento.
 		return NULL;
 	}
 	
-	rellenaMatriz(matriz, numFilasColumnas, valor);
+	for(int i = 0; i < numFilasColumnas; i++){
+		matriz[i] = (char *)malloc(numFilasColumnas * sizeof(char));
+		for(int j = 0; j < numFilasColumnas; j++){
+			matriz[i][j] = '?';
+		}
+	}
 	
 	return matriz;
 	  
   }
 
 
-  int check_option(int opcion, char ** matriz, Coordenadas_t bomba){
+  int check_option(int opcion, char ** matriz, Coordenadas_t bomba, int userSize){
 	
 	int filaUsuario;
 	int columnaUsuario;
@@ -142,24 +189,36 @@ momento.
 			scanf("%d %d", &filaUsuario, &columnaUsuario);
 			
 			if(filaUsuario == bomba.fila && columnaUsuario == bomba.columna){
+				
 				printf("Adivinaste el lugar de la bomba!!! -> (%d,%d) \n", filaUsuario, columnaUsuario);
 				printf("Fin del juego, gracias por participar. \n");
-				finJuego = true;
+				
+				for(int i = 0; i < userSize; i++){
+					free(matriz[i]);
+				}
+				free(matriz);
 				return 0;
 			}else{
 				printf("Fallo, intentelo de nuevo.\n");
+				rellenaMatriz(matriz, userSize, bomba, filaUsuario, columnaUsuario);
+				numeroIntentos(1);
 				return 1;
 			}
 			
 			break;
 		
 		case 2:
-			printf("Ha elegido visualizar el numero de intentos\n");
+			
+			printf("Ha elegido visualizar el numero de intentos: \n");
+			printf("El numero de intentos es: %d \n", numeroIntentos(0)); 
+			
 			break;
 		
 		
 		case 3:
-			printf("Ha elegido ver la matriz\n");
+
+			printf("Ha elegido ver la matriz: \n");
+			rellenaMatriz(matriz, userSize, bomba, filaUsuario, columnaUsuario);
 			break;
 		
 		
@@ -204,7 +263,7 @@ momento.
 		printf("4) Salir\n");
 		printf("***************************************************\n");
 		scanf("%d", &userOption); //Valor de memoria de la var userOption
-		check_option(userOption, matriz, bomba); //Valor real
+		check_option(userOption, matriz, bomba, userSize); //Valor real
 		
 	}
 	
