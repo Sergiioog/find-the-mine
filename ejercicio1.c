@@ -4,11 +4,11 @@
 
 
 • Se generará un tablero formado por casillas en las que el jugador debe buscar esa bomba. -> HECHO
-• Con cada intento del usuario se debe comprobar si las coordenadas introducidas coinciden con las de la bomba. 
-• En el momento que se encuentre la bomba acaba el programa. 
+• Con cada intento del usuario se debe comprobar si las coordenadas introducidas coinciden con las de la bomba. -> HECHO
+• En el momento que se encuentre la bomba acaba el programa. -> HECHO
 • En caso de no encontrarla, se marcan con ‘O’ las casillas exploradas y con ‘?’ las casillas no exploradas.
 • Se debe generar una matriz cuadrada de caracteres de un tamaño dado por el usuario. El tamaño de la matriz se pasa como parámetro de entrada por argc/argv, y se reservará memoria dinámica en
-función de ese valor.
+función de ese valor. -> HECHO
 
 • Se pide implementar una función que cree un array dinámico de dos dimensiones de un
 tamaño dado:
@@ -76,6 +76,7 @@ momento.
   #include <stdio.h>
   #include <string.h>
   #include <stdlib.h>
+  #include <stdbool.h>
   
   typedef struct {
 	int fila;
@@ -84,8 +85,35 @@ momento.
   
   int check_option(int opcion, char ** matriz, Coordenadas_t bomba);
   Coordenadas_t randomize_bomb(char ** matriz, int userSize);
+  char ** crearMatriz(int numFilasColumnas);
+  bool finJuego = false;
   
-  
+  char ** crearMatriz(int numFilasColumnas){
+
+	char ** matriz = (char **)malloc(numFilasColumnas * sizeof(char *));
+	
+	if(matriz == NULL){
+		printf("Error al asignar memoria");
+		return NULL;
+	}
+	
+	for(int i = 0; i < numFilasColumnas; i++){
+		matriz[i] = (char *)malloc(numFilasColumnas * sizeof(char));
+		for(int j = 0; j < numFilasColumnas; j++){
+			matriz[i][j] = '?';
+			printf("%c", matriz[i][j]);
+		}
+		printf("\n");
+	}
+	
+	
+	
+	return matriz;
+	  
+  }
+  /* Los elementos de la matriz pueden contener el valor:
+		 INCOGNITA = ‘?’
+		 AGUA = ‘O’*/
 
 
   int check_option(int opcion, char ** matriz, Coordenadas_t bomba){
@@ -98,30 +126,34 @@ momento.
 			
 			printf("Opcion 1, introduzca coordenadas (x y) : \n");
 			scanf("%d %d", &filaUsuario, &columnaUsuario);
-			printf("Las opciones que ha metido el usuario son %d %d\n", filaUsuario, columnaUsuario);
 			
 			if(filaUsuario == bomba.fila && columnaUsuario == bomba.columna){
-					printf("ADIVINASTEEEEE");
-					return 1;
-				}else{
-					printf("FALLASTE");
-					return 0;
-				}
-				
+				printf("Adivinaste el lugar de la bomba!!! -> (%d,%d) \n", filaUsuario, columnaUsuario);
+				printf("Fin del juego, gracias por participar. \n");
+				finJuego = true;
+				return 0;
+			}else{
+				printf("Fallo, intentelo de nuevo.\n");
+				return 1;
+			}
+			
 			break;
+		
 		case 2:
 			printf("Ha elegido visualizar el numero de intentos\n");
 			break;
+		
+		
 		case 3:
 			printf("Ha elegido ver la matriz\n");
 			break;
+		
+		
 		default:
 			printf("Opcion no valida\n");
 			break;
 	}
-	
-	return 0;
-  }
+}
   
   Coordenadas_t randomize_bomb(char ** matriz, int userSize){
 	  
@@ -148,15 +180,12 @@ momento.
 	printf("Bienvenido al juego, por favor, introduzca el area del tablero: ");
 	scanf("%d", &userSize);
 	
+	crearMatriz(userSize);
 	
-	char ** matriz = (char **)malloc(userSize * sizeof(char *));
-	for(int i = 0; i < userSize; i++){
-		matriz[i] = (char *)malloc(userSize * sizeof(char));
-	}
-	
+	char ** matriz = crearMatriz(userSize);
 	Coordenadas_t bomba = randomize_bomb(matriz, userSize);	 
 	
-	while(1){
+	while(!finJuego){
 		printf("***************************************************\n");
 		printf("Introduzca una opcion, por favor: \n");
 		printf("1) Buscar\n");
@@ -166,10 +195,12 @@ momento.
 		printf("***************************************************\n");
 		scanf("%d", &userOption); //Valor de memoria de la var userOption
 		check_option(userOption, matriz, bomba); //Valor real
+		
 	}
 	
-	printf("La direccion de memoria de la matriz es: %p\n", (void *)matriz);
-
+	for(int i = 0; i < userSize; i++){
+		free(matriz[i]);
+	}
 	free(matriz);
 	return 0;
   
