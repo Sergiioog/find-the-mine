@@ -11,14 +11,14 @@
 función de ese valor. -> HECHO
 
 • Se pide implementar una función que cree un array dinámico de dos dimensiones de un
-tamaño dado:
+tamaño dado: -> HECHO
 
 	• char** crearMatriz(int numFilasColumnas)
 	• Los elementos de la matriz pueden contener el valor:
 		 INCOGNITA = ‘?’
 		 AGUA = ‘O’
 
-• Se pide implementar una función que rellene un array dinámico doble con un valor por defecto. 
+• Se pide implementar una función que rellene un array dinámico doble con un valor por defecto. -> HECHO
 • Al inicio, se rellenará con el valor ‘?’ los elementos de la matriz doble creada anteriormente usando esta función:
 	 void rellenaMatriz(char** matriz, int tam, char valor)
 • El programa pedirá al usuario coordenadas (fila/columna) dentro de la matriz creada anteriormente.
@@ -86,10 +86,36 @@ momento.
   int check_option(int opcion, char ** matriz, Coordenadas_t bomba);
   Coordenadas_t randomize_bomb(char ** matriz, int userSize);
   char ** crearMatriz(int numFilasColumnas);
+  void rellenaMatriz(char** matriz, int tam, char valor);
   bool finJuego = false;
   
+  
+  void rellenaMatriz(char** matriz, int tam, char valor){
+	  
+	for(int i = 0; i < tam; i++){
+		matriz[i] = (char *)malloc(tam * sizeof(char));
+		for(int x = 0; x <= tam + 1; x++){
+			printf("-");
+		}
+		printf("\n");
+		printf("|");
+		for(int j = 0; j < tam; j++){
+			matriz[i][j] = valor;
+			printf("%c", matriz[i][j]);
+		}
+		printf("|\n");
+		for(int x = 0; x <= tam + 1; x++){
+			printf("-");
+		}
+		printf("\n");
+	}
+	  
+  }
+  
+	
   char ** crearMatriz(int numFilasColumnas){
 
+	char valor = '?';
 	char ** matriz = (char **)malloc(numFilasColumnas * sizeof(char *));
 	
 	if(matriz == NULL){
@@ -97,23 +123,11 @@ momento.
 		return NULL;
 	}
 	
-	for(int i = 0; i < numFilasColumnas; i++){
-		matriz[i] = (char *)malloc(numFilasColumnas * sizeof(char));
-		for(int j = 0; j < numFilasColumnas; j++){
-			matriz[i][j] = '?';
-			printf("%c", matriz[i][j]);
-		}
-		printf("\n");
-	}
-	
-	
+	rellenaMatriz(matriz, numFilasColumnas, valor);
 	
 	return matriz;
 	  
   }
-  /* Los elementos de la matriz pueden contener el valor:
-		 INCOGNITA = ‘?’
-		 AGUA = ‘O’*/
 
 
   int check_option(int opcion, char ** matriz, Coordenadas_t bomba){
@@ -161,9 +175,7 @@ momento.
 	  
 	  bomba.fila = rand() % userSize;
 	  bomba.columna = rand() % userSize;
-	  
-	  matriz[bomba.fila][bomba.columna];
-	  
+	  	  
 	  printf(">>> La bomba esta en: Fila: %d, Columna: %d\n", bomba.fila, bomba.columna);
 		
 	  return bomba;
@@ -179,9 +191,7 @@ momento.
 	
 	printf("Bienvenido al juego, por favor, introduzca el area del tablero: ");
 	scanf("%d", &userSize);
-	
-	crearMatriz(userSize);
-	
+		
 	char ** matriz = crearMatriz(userSize);
 	Coordenadas_t bomba = randomize_bomb(matriz, userSize);	 
 	
