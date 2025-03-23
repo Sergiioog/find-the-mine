@@ -80,21 +80,6 @@ momento.
 • El objetivo es encontrar la bomba escondida, se debe almacenar cada intento del usuario y el resultado del mismo. En caso de no haberse encontrado la bomba, este intento 
 	guardará información de ayuda:
 
-		 La bomba está en esa fila
-		 La bomba está en esa columna
-		 Bomba encontrada
-		 Se debe crear una estructura adecuada para almacenar esos intentos, y un array dinámico
-		que crecerá con cada nuevo intento.
-		 intento_t pedirIntento();
-		• Esta función pide una fila/columna al usuario, lo almacena en una estructura
-		“intento_t” y devuelve al usuario.
-		 void testeaIntento(char** matriz, intento_t* nuevoIntento, coordenadas_t coordenadasBomba)
-		
-		
-			 intento_t pedirIntento();
-		• Esta función pide una fila/columna al usuario, lo almacena en una estructura
-		“intento_t” y devuelve al usuario.
-		 void testeaIntento(char** matriz, intento_t* nuevoIntento, coordenadas_t coordenadasBomba)
 */
   
   #include <stdio.h>
@@ -115,28 +100,45 @@ momento.
 
   int check_option(int opcion, char **matriz, Coordenadas_t bomba, int userSize);
   Coordenadas_t randomize_bomb(char ** matriz, int userSize);
-  char ** crearMatriz(int numFilasColumnas);
-  void rellenaMatriz(char** matriz, int tam, Coordenadas_t bomba, int filaUsuario, int columnaUsuario);
-  void testeaIntento(Intento_t nuevoIntento, int filaUsuario, int columnaUsuario);
-  bool finJuego = false;
+  char ** create_matriz(int numFilasColumnas);
+  void fill_matriz(char** matriz, int tam, Coordenadas_t bomba, int filaUsuario, int columnaUsuario);
+  int number_tryials(int intento, Coordenadas_t bomba);
+  void give_advise(Coordenadas_t bomba, int id);
+  bool endGame = false;
   
+   void give_advise(Coordenadas_t bomba, int id) {
+	   
+    if (id == 1) {
+        printf("PISTA: La fila de la bomba es... %d\n", bomba.fila);
+    }
+
+    if (id == 2) {
+        printf("PISTA: La columna de la bomba es... %d\n", bomba.columna);
+    }
+}
   
-  int numeroIntentos(int intento){
-	
-	
+  int number_tryials(int intento, Coordenadas_t bomba){
 	
 	static int contador = 0;
 	contador += intento;
+	int bombaFilaId = 1;
+	int bombaColumnaId = 2;
+	
+	if(contador > 6){
+		give_advise(bomba, bombaFilaId);
+	}
+	
+	if(contador > 9){
+		give_advise(bomba, bombaColumnaId);
+	}
+	
 	return contador;	
   
   }
-  
  
-void testeaIntento(Intento_t nuevoIntento, int filaUsuario, int columnaUsuario){}
+
   
-  
-  
- void rellenaMatriz(char** matriz, int tam, Coordenadas_t bomba, int filaUsuario, int columnaUsuario){
+ void fill_matriz(char** matriz, int tam, Coordenadas_t bomba, int filaUsuario, int columnaUsuario){
 	
 	for(int i = 0; i < tam; i++){
 		
@@ -153,7 +155,7 @@ void testeaIntento(Intento_t nuevoIntento, int filaUsuario, int columnaUsuario){
 					matriz[i][j] = 'O';
 				}
 			} 
-			if(finJuego == true){
+			if(endGame == true){
 				matriz[bomba.fila-1][bomba.columna-1] = 'X';
 			}
 			printf("%c", matriz[i][j]);
@@ -164,11 +166,10 @@ void testeaIntento(Intento_t nuevoIntento, int filaUsuario, int columnaUsuario){
 		}
 		printf("\n");
 	}
-	  
   }
   
 	
-  char ** crearMatriz(int numFilasColumnas){
+  char ** create_matriz(int numFilasColumnas){
 	 
 	char ** matriz = (char **)malloc(numFilasColumnas * sizeof(char *));
 	
@@ -197,24 +198,31 @@ void testeaIntento(Intento_t nuevoIntento, int filaUsuario, int columnaUsuario){
 	int numeroIntento = 1;
 	intento.nuevoIntento = numeroIntento;
 	
-	
 	switch(opcion) {
+		
 		case 1:
 			
 			printf("Opcion 1, introduzca coordenadas (x y) : \n");
-			scanf("%d %d", &filaUsuario, &columnaUsuario);
+			
+			
+			if(scanf("%d %d", &filaUsuario, &columnaUsuario) != 2){
+				printf("Error: Debe ingresar dos numeros enteros.\n");
+				while (getchar() != '\n');  
+				return 1;
+			}
 			
 			if(filaUsuario == bomba.fila && columnaUsuario == bomba.columna){
 				
 				printf("Adivinaste el lugar de la bomba!!! -> (%d,%d) \n", filaUsuario, columnaUsuario);
 				printf("Fin del juego, gracias por participar. \n");
-				rellenaMatriz(matriz, userSize, bomba, filaUsuario, columnaUsuario);
+				fill_matriz(matriz, userSize, bomba, filaUsuario, columnaUsuario);
 				
 				for(int i = 0; i < userSize; i++){
 					free(matriz[i]);
 				}
 				free(matriz);
 				exit(0);
+				
 			}else{
 				
 				if(filaUsuario < 1 || filaUsuario > userSize || columnaUsuario < 1 || columnaUsuario > userSize){
@@ -222,9 +230,8 @@ void testeaIntento(Intento_t nuevoIntento, int filaUsuario, int columnaUsuario){
 					return 0;
 				}else{
 					printf("Fallo, intentelo de nuevo.\n");
-					rellenaMatriz(matriz, userSize, bomba, filaUsuario, columnaUsuario);
-				    testeaIntento(intento, filaUsuario,columnaUsuario);
-					numeroIntentos(1);
+					fill_matriz(matriz, userSize, bomba, filaUsuario, columnaUsuario);
+					number_tryials(1, bomba);
 					return 1;
 				}
 				
@@ -235,25 +242,26 @@ void testeaIntento(Intento_t nuevoIntento, int filaUsuario, int columnaUsuario){
 		case 2:
 			
 			printf("Ha elegido visualizar el numero de intentos: \n");
-			printf("El numero de intentos es: %d \n", numeroIntentos(0)); 
-			
+			printf("El numero de intentos es: %d \n", number_tryials(0, bomba)); 
 			break;
 		
 		
 		case 3:
 
 			printf("Ha elegido ver la matriz: \n");
-			rellenaMatriz(matriz, userSize, bomba, filaUsuario, columnaUsuario);
+			fill_matriz(matriz, userSize, bomba, filaUsuario, columnaUsuario);
 			break;
 		
 		
 		case 4:
+	
 			printf("Saliendo... gracias por participar! \n");
-			finJuego = true;
-			rellenaMatriz(matriz, userSize, bomba, filaUsuario, columnaUsuario);
+			endGame = true;
+			fill_matriz(matriz, userSize, bomba, filaUsuario, columnaUsuario);
 			exit(0);
 		
 		default:
+		
 			printf("Error, introduzca una opcion valida\n");
 			return 0;
 			
@@ -263,12 +271,9 @@ void testeaIntento(Intento_t nuevoIntento, int filaUsuario, int columnaUsuario){
   Coordenadas_t randomize_bomb(char ** matriz, int userSize){
 	  
 	  Coordenadas_t bomba;
-	  
 	  bomba.fila = rand() % userSize;
 	  bomba.columna = rand() % userSize;
-	  	  
-	  printf(">>> La bomba esta en: Fila: %d, Columna: %d\n", bomba.fila, bomba.columna);
-		
+	  	  		
 	  return bomba;
   }
  
@@ -279,14 +284,19 @@ void testeaIntento(Intento_t nuevoIntento, int filaUsuario, int columnaUsuario){
 	int userSize;
 	int userOption;
 	
-	
 	printf("Bienvenido al juego, por favor, introduzca el area del tablero: ");
-	scanf("%d", &userSize);
+	
+	if (scanf("%d", &userSize) != 1) {
+        printf("Error: Debe ingresar un numero entero.\n");
+        while (getchar() != '\n'); 
+		exit(1);
+    }
 		
-	char ** matriz = crearMatriz(userSize);
+	char ** matriz = create_matriz(userSize);
 	Coordenadas_t bomba = randomize_bomb(matriz, userSize);	 
 	
-	while(!finJuego){
+	while(!endGame){
+		
 		printf("***************************************************\n");
 		printf("Introduzca una opcion, por favor: \n");
 		printf("1) Buscar\n");
@@ -294,15 +304,22 @@ void testeaIntento(Intento_t nuevoIntento, int filaUsuario, int columnaUsuario){
 		printf("3) Ver la matriz\n");
 		printf("4) Salir\n");
 		printf("***************************************************\n");
-		scanf("%d", &userOption); //Valor de memoria de la var userOption
-		check_option(userOption, matriz, bomba, userSize); //Valor real
 		
+		if (scanf("%d", &userOption) != 1) {
+            printf("Error: Debe ingresar un número entero.\n");
+            while (getchar() != '\n'); 
+            continue; //Continuar preguntando opciones si no es un num
+        }
+
+		check_option(userOption, matriz, bomba, userSize);
+	
 	}
 	
 	for(int i = 0; i < userSize; i++){
 		free(matriz[i]);
 	}
+	
 	free(matriz);
+	
 	return 0;
-  
  }
