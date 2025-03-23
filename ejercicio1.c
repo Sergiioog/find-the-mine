@@ -49,13 +49,13 @@ momento.
 
 • Para interactuar con el programa, se debe crear un menú que pida datos al usuario. Las opciones de menú son las siguientes:
 	1 Buscar la bomba:
-		 Pedirá por pantalla fila y columna, testeará esas coordenadas y guardará la siguiente
+		 Pedirá por pantalla fila y columna, testeará esas coordenadas y guardará la siguiente -> FALTA INTENTOS
 		información en un array dinámico de intentos:
 		• fila, columna, si la bomba se encuentra en esa fila o en esa columna.
 	
 	
 	2 Visualizar la matriz:
-		 Presentará por pantalla la matriz indicando con el caracter ‘?’ que no se ha buscado
+		 Presentará por pantalla la matriz indicando con el caracter ‘?’ que no se ha buscado -> HECHO
 		en esa posición y con ‘O’ que ha sido un intento fallido.
 		
 		
@@ -66,10 +66,10 @@ momento.
 		se acierta la fila o la columna
 	
 	4 Salir
-		Presenta la matriz antes de salir, en este caso indicando una ‘X’ donde se encontraba
+		Presenta la matriz antes de salir, en este caso indicando una ‘X’ donde se encontraba -> HECHO
 		la bomba.
 	
-	5 Libera toda la memoria dinámica del programa antes de acabar
+	5 Libera toda la memoria dinámica del programa antes de acabar -> HECHO
 	
 • Pista: Piensa que primero tendrás que pedir memoria para los punteros de cada fila y luego para cada array de caracteres, cuyo tamaño coincide con el de las columnas. Al ser una matriz cuadrada el
   tamaño será el mismo tanto para las filas como para las columnas.
@@ -111,7 +111,7 @@ momento.
   int check_option(int opcion, char ** matriz, Coordenadas_t bomba, int userSize);
   Coordenadas_t randomize_bomb(char ** matriz, int userSize);
   char ** crearMatriz(int numFilasColumnas);
-  void rellenaMatriz(char** matriz, int tam, Coordenadas_t bomba, int filaUsuario, int columnaUsuario);
+  void rellenaMatriz(char** matriz, int tam, Coordenadas_t bomba, Coordenadas_t filaUsuario, Coordenadas_t columnaUsuario);
   bool finJuego = false;
   
   
@@ -126,10 +126,9 @@ momento.
   
   
   
- void rellenaMatriz(char** matriz, int tam, Coordenadas_t bomba, int filaUsuario, int columnaUsuario){
+ void rellenaMatriz(char** matriz, int tam, Coordenadas_t bomba, Coordenadas_t filaUsuario, Coordenadas_t columnaUsuario){
 	
 	for(int i = 0; i < tam; i++){
-		
 		
 		for(int x = 0; x <= tam + 1; x++){
 			printf("-");
@@ -144,10 +143,9 @@ momento.
 					matriz[i][j] = 'O';
 				}
 			} 
-			
-			
-
-			
+			if(finJuego == true){
+				matriz[bomba.fila-1][bomba.columna-1] = 'X';
+			}
 			printf("%c", matriz[i][j]);
 		}
 		printf("|\n");
@@ -235,9 +233,14 @@ momento.
 			break;
 		
 		
-		default:
+		case 4:
 			printf("Saliendo... gracias por participar! \n");
 			finJuego = true;
+			rellenaMatriz(matriz, userSize, bomba, filaUsuario, columnaUsuario);
+			exit(0);
+		
+		default:
+			printf("Error, introduzca una opcion valida\n");
 			return 0;
 			
 	}
