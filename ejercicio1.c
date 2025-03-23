@@ -127,22 +127,27 @@ momento.
   
   
  void rellenaMatriz(char** matriz, int tam, Coordenadas_t bomba, int filaUsuario, int columnaUsuario){
-				
 	
 	for(int i = 0; i < tam; i++){
+		
+		
 		for(int x = 0; x <= tam + 1; x++){
 			printf("-");
 		}
 		printf("\n");
 		printf("|");
 		for(int j = 0; j < tam; j++){
-			if(filaUsuario == i && columnaUsuario == j){
-				matriz[i][j] = 'O';
-			} else {
-				if (matriz[i][j] != 'O') {
-					matriz[i][j] = '?';
+			if(filaUsuario - 1 == i && columnaUsuario - 1 == j){
+				if(filaUsuario == bomba.fila && columnaUsuario == bomba.columna){
+					matriz[i][j] = 'X';
+				}else{
+					matriz[i][j] = 'O';
 				}
-			}
+			} 
+			
+			
+
+			
 			printf("%c", matriz[i][j]);
 		}
 		printf("|\n");
@@ -192,17 +197,25 @@ momento.
 				
 				printf("Adivinaste el lugar de la bomba!!! -> (%d,%d) \n", filaUsuario, columnaUsuario);
 				printf("Fin del juego, gracias por participar. \n");
+				rellenaMatriz(matriz, userSize, bomba, filaUsuario, columnaUsuario);
 				
 				for(int i = 0; i < userSize; i++){
 					free(matriz[i]);
 				}
 				free(matriz);
-				return 0;
+				exit(0);
 			}else{
-				printf("Fallo, intentelo de nuevo.\n");
-				rellenaMatriz(matriz, userSize, bomba, filaUsuario, columnaUsuario);
-				numeroIntentos(1);
-				return 1;
+				
+				if(filaUsuario < 1 || filaUsuario > userSize || columnaUsuario < 1 || columnaUsuario > userSize){
+					printf("Indices excedidos, introduzca coordenadas validas. El limite es: %d .\n", userSize);
+					return 0;
+				}else{
+					printf("Fallo, intentelo de nuevo.\n");
+					rellenaMatriz(matriz, userSize, bomba, filaUsuario, columnaUsuario);
+					numeroIntentos(1);
+					return 1;
+				}
+				
 			}
 			
 			break;
@@ -223,8 +236,10 @@ momento.
 		
 		
 		default:
-			printf("Opcion no valida\n");
-			break;
+			printf("Saliendo... gracias por participar! \n");
+			finJuego = true;
+			return 0;
+			
 	}
 }
   
