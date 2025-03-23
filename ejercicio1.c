@@ -107,26 +107,36 @@ momento.
 	int columna;
   } Coordenadas_t;	
   
+  typedef struct{
+	int nuevoIntento;
+	int **numIntentos;
+  } Intento_t;
+  
 
-  int check_option(int opcion, char ** matriz, Coordenadas_t bomba, int userSize);
+  int check_option(int opcion, char **matriz, Coordenadas_t bomba, int userSize);
   Coordenadas_t randomize_bomb(char ** matriz, int userSize);
   char ** crearMatriz(int numFilasColumnas);
-  void rellenaMatriz(char** matriz, int tam, Coordenadas_t bomba, Coordenadas_t filaUsuario, Coordenadas_t columnaUsuario);
+  void rellenaMatriz(char** matriz, int tam, Coordenadas_t bomba, int filaUsuario, int columnaUsuario);
+  void testeaIntento(Intento_t nuevoIntento, int filaUsuario, int columnaUsuario);
   bool finJuego = false;
   
   
   int numeroIntentos(int intento){
+	
+	
 	
 	static int contador = 0;
 	contador += intento;
 	return contador;	
   
   }
-
+  
+ 
+void testeaIntento(Intento_t nuevoIntento, int filaUsuario, int columnaUsuario){}
   
   
   
- void rellenaMatriz(char** matriz, int tam, Coordenadas_t bomba, Coordenadas_t filaUsuario, Coordenadas_t columnaUsuario){
+ void rellenaMatriz(char** matriz, int tam, Coordenadas_t bomba, int filaUsuario, int columnaUsuario){
 	
 	for(int i = 0; i < tam; i++){
 		
@@ -160,7 +170,6 @@ momento.
 	
   char ** crearMatriz(int numFilasColumnas){
 	 
-
 	char ** matriz = (char **)malloc(numFilasColumnas * sizeof(char *));
 	
 	if(matriz == NULL){
@@ -184,6 +193,10 @@ momento.
 	
 	int filaUsuario;
 	int columnaUsuario;
+	Intento_t intento;
+	int numeroIntento = 1;
+	intento.nuevoIntento = numeroIntento;
+	
 	
 	switch(opcion) {
 		case 1:
@@ -210,6 +223,7 @@ momento.
 				}else{
 					printf("Fallo, intentelo de nuevo.\n");
 					rellenaMatriz(matriz, userSize, bomba, filaUsuario, columnaUsuario);
+				    testeaIntento(intento, filaUsuario,columnaUsuario);
 					numeroIntentos(1);
 					return 1;
 				}
