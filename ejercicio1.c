@@ -106,69 +106,55 @@ momento.
   void give_advise(Coordenadas_t bomba, int id);
   bool endGame = false;
   
-   void give_advise(Coordenadas_t bomba, int id) {
-	   
-    if (id == 1) {
-        printf("PISTA: La fila de la bomba es... %d\n", bomba.fila);
-    }
-
-    if (id == 2) {
-        printf("PISTA: La columna de la bomba es... %d\n", bomba.columna);
-    }
-}
-  
-  int number_tryials(int intento, Coordenadas_t bomba){
-	
-	static int contador = 0;
-	contador += intento;
-	int bombaFilaId = 1;
-	int bombaColumnaId = 2;
-	
-	if(contador > 6){
-		give_advise(bomba, bombaFilaId);
-	}
-	
-	if(contador > 9){
-		give_advise(bomba, bombaColumnaId);
-	}
-	
-	return contador;	
-  
-  }
  
-
   
- void fill_matriz(char** matriz, int tam, Coordenadas_t bomba, int filaUsuario, int columnaUsuario){
+  int main(int argc, char * argv[]){
+	  
+	  
+	int userSize;
+	int userOption;
 	
-	for(int i = 0; i < tam; i++){
+	printf("Bienvenido al juego, por favor, introduzca el area del tablero: ");
+	
+	if (scanf("%d", &userSize) != 1) {
+        printf("Error: Debe ingresar un numero entero.\n");
+        while (getchar() != '\n'); 
+		exit(1);
+    }
 		
-		for(int x = 0; x <= tam + 1; x++){
-			printf("-");
-		}
-		printf("\n");
-		printf("|");
-		for(int j = 0; j < tam; j++){
-			if(filaUsuario - 1 == i && columnaUsuario - 1 == j){
-				if(filaUsuario == bomba.fila && columnaUsuario == bomba.columna){
-					matriz[i][j] = 'X';
-				}else{
-					matriz[i][j] = 'O';
-				}
-			} 
-			if(endGame == true){
-				matriz[bomba.fila-1][bomba.columna-1] = 'X';
-			}
-			printf("%c", matriz[i][j]);
-		}
-		printf("|\n");
-		for(int x = 0; x <= tam + 1; x++){
-			printf("-");
-		}
-		printf("\n");
-	}
-  }
-  
+	char ** matriz = create_matriz(userSize);
+	Coordenadas_t bomba = randomize_bomb(matriz, userSize);	 
 	
+	while(!endGame){
+		
+		printf("***************************************************\n");
+		printf("Introduzca una opcion, por favor: \n");
+		printf("1) Buscar\n");
+		printf("2) Visualizar numero de intentos \n");
+		printf("3) Ver la matriz\n");
+		printf("4) Salir\n");
+		printf("***************************************************\n");
+		
+		if (scanf("%d", &userOption) != 1) {
+            printf("Error: Debe ingresar un numero entero.\n");
+            while (getchar() != '\n'); 
+            continue; //Continuar preguntando opciones si no es un num
+        }
+
+		check_option(userOption, matriz, bomba, userSize);
+	
+	}
+	
+	for(int i = 0; i < userSize; i++){
+		free(matriz[i]);
+	}
+	
+	free(matriz);
+	
+	return 0;
+ }
+ 
+ 	
   char ** create_matriz(int numFilasColumnas){
 	 
 	char ** matriz = (char **)malloc(numFilasColumnas * sizeof(char *));
@@ -277,49 +263,66 @@ momento.
 	  return bomba;
   }
  
-  
-  
-  int main(int argc, char * argv[]){
-	  
-	int userSize;
-	int userOption;
+   
+ void fill_matriz(char** matriz, int tam, Coordenadas_t bomba, int filaUsuario, int columnaUsuario){
+	 
 	
-	printf("Bienvenido al juego, por favor, introduzca el area del tablero: ");
+	for(int i = 0; i < tam; i++){
+		
+		for(int x = 0; x <= tam + 1; x++){
+			printf("-");
+		}
+		printf("\n");
+		printf("|");
+		for(int j = 0; j < tam; j++){
+			if(filaUsuario - 1 == i && columnaUsuario - 1 == j){
+				if(filaUsuario == bomba.fila && columnaUsuario == bomba.columna){
+					matriz[i][j] = 'X';
+				}else{
+					matriz[i][j] = 'O';
+				}
+			} 
+			if(endGame == true){
+				matriz[bomba.fila-1][bomba.columna-1] = 'X';
+			}
+			printf("%c", matriz[i][j]);
+		}
+		printf("|\n");
+		for(int x = 0; x <= tam + 1; x++){
+			printf("-");
+		}
+		printf("\n");
+	}
+  }
+  
+ int number_tryials(int intento, Coordenadas_t bomba){
 	
-	if (scanf("%d", &userSize) != 1) {
-        printf("Error: Debe ingresar un numero entero.\n");
-        while (getchar() != '\n'); 
-		exit(1);
+	static int contador = 0;
+	contador += intento;
+	int bombaFilaId = 1;
+	int bombaColumnaId = 2;
+	
+	if(contador > 6){
+		give_advise(bomba, bombaFilaId);
+	}
+	
+	if(contador > 9){
+		give_advise(bomba, bombaColumnaId);
+	}
+	
+	return contador;	
+  
+  }
+ 
+  
+ void give_advise(Coordenadas_t bomba, int id) {
+	   
+    if (id == 1) {
+        printf("PISTA: La fila de la bomba es... %d\n", bomba.fila);
     }
-		
-	char ** matriz = create_matriz(userSize);
-	Coordenadas_t bomba = randomize_bomb(matriz, userSize);	 
-	
-	while(!endGame){
-		
-		printf("***************************************************\n");
-		printf("Introduzca una opcion, por favor: \n");
-		printf("1) Buscar\n");
-		printf("2) Visualizar numero de intentos \n");
-		printf("3) Ver la matriz\n");
-		printf("4) Salir\n");
-		printf("***************************************************\n");
-		
-		if (scanf("%d", &userOption) != 1) {
-            printf("Error: Debe ingresar un número entero.\n");
-            while (getchar() != '\n'); 
-            continue; //Continuar preguntando opciones si no es un num
-        }
 
-		check_option(userOption, matriz, bomba, userSize);
-	
-	}
-	
-	for(int i = 0; i < userSize; i++){
-		free(matriz[i]);
-	}
-	
-	free(matriz);
-	
-	return 0;
- }
+    if (id == 2) {
+        printf("PISTA: La columna de la bomba es... %d\n", bomba.columna);
+    }
+}
+  
